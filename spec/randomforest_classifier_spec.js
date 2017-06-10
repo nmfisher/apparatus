@@ -22,11 +22,30 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 var RandomForestClassifier = new require('../lib/apparatus/classifier/randomforest_classifier');
+var fs = require('fs'),    readline = require('readline');
+var iris = fs.readFileSync('./spec/data/iris.data').toString().split("\n");
+var train_examples = [], test_examples = [], train_labels=[], test_labels=[];
+for(var i=0;i<iris.length;i++) {
+    var line = iris[i].split(",");
+    let inputs = line.splice(0,4), label = line[0];
+
+    for(var j=0;j<inputs.length;j++) {
+        inputs[j] = parseFloat(inputs[j]);
+    }
+
+    if(i % 4 == 0) {
+        test_examples.push(inputs);
+        test_labels.push(label);
+    } else {
+        train_examples.push(inputs);
+        train_labels.push(label);
+    }
+}
 
 describe('randomforest', function() {
-    it('should perform binary classification with 2d features', function() {
-         var randomforest = new RandomForestClassifier();
 
+    it('should perform binary classification with 2d features', function() {           
+        
         randomforest.addExample([-0.4326,  1.1909   ], 1);
         randomforest.addExample([1.5    , 3.0       ], 1);
         randomforest.addExample([0.1253 , -0.0376   ], 1);
@@ -37,11 +56,9 @@ describe('randomforest', function() {
         randomforest.addExample([1.4117 ,   2.0593  ], -1);
         randomforest.addExample([4.1832 ,   1.9044  ], -1);
         randomforest.addExample([1.8636 ,   1.1677  ], -1);
-
-        randomforest.train();
-
+        
         expect(randomforest.classify([-0.5 , -0.5 ])).toBe(1);
-
+        
         // random forest are not deterministic, check on average it works
         var count = 0;
         for(var tests=0; tests<200; tests++){
@@ -50,12 +67,27 @@ describe('randomforest', function() {
                 count++;
             }
         }
-        expect(count).toBeGreaterThan(50);
+        expect(count).toBeGreaterThan(50); 
     }); 
+    
+    it('should correctly classify the IRIS dataset', function() {
 
+        var randomforest = new RandomForestClassifier();
+        
+        for(var i = 0; i < train_examples.length; i++) {
+          randomforest.addExample(train_examples[i], train_labels[i]);
+        }
+        
+        randomforest.train();
+        
+        for(var i = 0; i < test_examples.length; i++) {
+          expect(randomforest.classify(test_examples[i])).toBe(test_labels[i])
+        }
+    });
+    
     it('should perform binary classification with 3d features', function() {
 
-           var randomforest = new RandomForestClassifier();
+       var randomforest = new RandomForestClassifier();
 
         // generated from sklearn.datasets.make_classification
         var train_examples = [[ 0.31999894,  1.91372333, -1.98036028],
@@ -72,8 +104,7 @@ describe('randomforest', function() {
        [ 1.78842516, -1.54995222,  0.77821554],
        [ 0.8099707 ,  1.36182829, -1.47551252],
        [ 0.06052699, -0.5740107 ,  0.44690002],
-       [-0.40241265, -0.25016624,  0.17326464]
-       ]
+       [-0.40241265, -0.25016624,  0.17326464]]
 
         var test_examples = [[ 0.56645301,  1.1245596 , -0.43972837],
        [ 1.2918756 , -0.63501136,  3.50284953],
@@ -82,7 +113,6 @@ describe('randomforest', function() {
 
         var train_labels = [1, -1, 1, -1, 1, 1, -1, 1, -1, 1, -1, -1, 1, -1, 1]
         var test_labels = [1, -1, 1, -1, -1]
-        
         
         for(var i = 0; i < train_examples.length; i++) {
           randomforest.addExample(train_examples[i], train_labels[i]);
@@ -104,7 +134,7 @@ describe('randomforest', function() {
         expect(count).toBeGreaterThan(50);
     }); 
 
-    /* it('should perform multiclass classification with 3d features', function() {
+    it('should perform multiclass classification with 3d features', function() {
         var randomforest = new RandomForestClassifier();
 
         // generated from sklearn.datasets.make_classification
@@ -200,6 +230,5 @@ describe('randomforest', function() {
             }
         }
         expect(count).toBeGreaterThan(50);
-		}); */
-
+		}); 
 });
