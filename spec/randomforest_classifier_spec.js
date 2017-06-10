@@ -25,7 +25,7 @@ var RandomForestClassifier = new require('../lib/apparatus/classifier/randomfore
 
 describe('randomforest', function() {
     it('should perform binary classification with 2d features', function() {
-        var randomforest = new RandomForestClassifier();
+         var randomforest = new RandomForestClassifier();
 
         randomforest.addExample([-0.4326,  1.1909   ], 1);
         randomforest.addExample([1.5    , 3.0       ], 1);
@@ -44,16 +44,67 @@ describe('randomforest', function() {
 
         // random forest are not deterministic, check on average it works
         var count = 0;
-        for(var tests=0; tests<100; tests++){
+        for(var tests=0; tests<200; tests++){
             randomforest.train();
             if(randomforest.classify([1.0, 2.0]) == 1) {
                 count++;
             }
         }
         expect(count).toBeGreaterThan(50);
-    });
+    }); 
 
-    it('should perform multiclass classification with 3d features', function() {
+    it('should perform binary classification with 3d features', function() {
+
+           var randomforest = new RandomForestClassifier();
+
+        // generated from sklearn.datasets.make_classification
+        var train_examples = [[ 0.31999894,  1.91372333, -1.98036028],
+       [ 1.05453944, -1.21106664,  0.00927224],
+       [ 2.61173377, -0.40054523, -0.3690041 ],
+       [ 1.10489233, -1.3502401 , -0.33534969],
+       [ 0.40562784,  1.6345255 , -0.62287599],
+       [ 3.01454072, -0.09388323, -0.43408737],
+       [ 2.13597933, -1.53793093,  1.59821161],
+       [ 0.59330429,  1.32307389, -1.04905444],
+       [ 0.65048203, -1.08185649, -0.36457733],
+       [ 0.3702715 ,  1.69262476, -0.68328002],
+       [-1.13816744, -0.00937671, -0.64013047],
+       [ 1.78842516, -1.54995222,  0.77821554],
+       [ 0.8099707 ,  1.36182829, -1.47551252],
+       [ 0.06052699, -0.5740107 ,  0.44690002],
+       [-0.40241265, -0.25016624,  0.17326464]
+       ]
+
+        var test_examples = [[ 0.56645301,  1.1245596 , -0.43972837],
+       [ 1.2918756 , -0.63501136,  3.50284953],
+       [-1.02497955,  2.4921979 , -0.75041686],
+       [ 2.01112297, -1.50679903,  1.75976501]]
+
+        var train_labels = [1, -1, 1, -1, 1, 1, -1, 1, -1, 1, -1, -1, 1, -1, 1]
+        var test_labels = [1, -1, 1, -1, -1]
+        
+        
+        for(var i = 0; i < train_examples.length; i++) {
+          randomforest.addExample(train_examples[i], train_labels[i]);
+        }
+
+        randomforest.train();
+        for(var i = 0; i < test_examples.length; i++) {
+          expect(randomforest.classify(test_examples[i])).toBe(test_labels[i])
+        }
+        
+
+        // random forest are not deterministic, check on average it works
+        var count = 0;
+        for(var tests=0; tests<100; tests++){
+            if(randomforest.classify([ 1.76931368, -1.15994557,  2.32671689]) == -1) {
+                count++;
+            }
+        }
+        expect(count).toBeGreaterThan(50);
+    }); 
+
+    /* it('should perform multiclass classification with 3d features', function() {
         var randomforest = new RandomForestClassifier();
 
         // generated from sklearn.datasets.make_classification
@@ -149,6 +200,6 @@ describe('randomforest', function() {
             }
         }
         expect(count).toBeGreaterThan(50);
-		});
+		}); */
 
 });
