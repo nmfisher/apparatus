@@ -93,6 +93,54 @@ describe('randomforest', function() {
         
         expect(correct).toBeGreaterThan(test_examples.length * 0.9); 
 
+    }); 
+    
+     it('should correctly classify a sparse, multiclass dataset', function() {
+
+       var randomforest = new RandomForestClassifier();
+
+        randomforest.addExample([1,0,0,0,0,0,0,0,0,0,1], "one");
+        randomforest.addExample([1,1,0,0,0,0,0,0,0,0,0], "one");
+        randomforest.addExample([1,0,0,0,0,0,0,0,0,1,0], "one");
+        randomforest.addExample([1,0,0,0,0,0,0,0,1,0,0], "one");
+        randomforest.addExample([1,0,0,1,0,0,0,0,1,0,0], "one");
+        randomforest.addExample([0,0,1,0,1,0,1,0,0,0,0], "two");
+        randomforest.addExample([0,1,1,0,0,0,0,0,0,0,0], "two");
+        randomforest.addExample([0,0,1,0,0,0,0,0,0,1,1], "two");
+        randomforest.addExample([0,0,1,0,0,0,0,0,0,0,1], "two");
+        randomforest.addExample([0,0,1,1,0,0,0,0,0,0,0], "two");
+        randomforest.addExample([0,0,0,0,0,1,0,0,0,0,1], "three");
+        randomforest.addExample([0,0,0,0,0,1,0,0,0,1,0], "three");
+        randomforest.addExample([0,0,0,0,0,1,0,0,1,0,0], "three");
+        randomforest.addExample([0,0,0,0,0,1,0,1,0,0,0], "three");
+        randomforest.addExample([0,0,0,0,0,1,1,0,0,0,0], "three");
+        randomforest.train();
+        expect(randomforest.classify([0,0,0,0,0,1,0,0,0,0,0])).toBe("three"); 
+
+    });
+    
+    it('should correctly classify a sparse, multiclass dataset with maxDepth 1', function() {
+
+       var randomforest = new RandomForestClassifier(null, { maxDepth: 1});
+
+        randomforest.addExample([1,0,0,0,0,0,0,0,0,0,1], "one");
+        randomforest.addExample([1,1,0,0,0,0,0,0,0,0,0], "one");
+        randomforest.addExample([1,0,0,0,0,0,0,0,0,1,0], "one");
+        randomforest.addExample([1,0,0,0,0,0,0,0,1,0,0], "one");
+        randomforest.addExample([1,0,0,1,0,0,0,0,1,0,0], "one");
+        randomforest.addExample([0,0,1,0,1,0,1,0,0,0,0], "two");
+        randomforest.addExample([0,1,1,0,0,0,0,0,0,0,0], "two");
+        randomforest.addExample([0,0,1,0,0,0,0,0,0,1,1], "two");
+        randomforest.addExample([0,0,1,0,0,0,0,0,0,0,1], "two");
+        randomforest.addExample([0,0,1,1,0,0,0,0,0,0,0], "two");
+        randomforest.addExample([0,0,0,0,0,1,0,0,0,0,1], "three");
+        randomforest.addExample([0,0,0,0,0,1,0,0,0,1,0], "three");
+        randomforest.addExample([0,0,0,0,0,1,0,0,1,0,0], "three");
+        randomforest.addExample([0,0,0,0,0,1,0,1,0,0,0], "three");
+        randomforest.addExample([0,0,0,0,0,1,1,0,0,0,0], "three");
+        randomforest.train();
+        expect(randomforest.classify([0,0,0,0,0,1,0,0,0,0,0])).toBe("three"); 
+
     });
     
 });
